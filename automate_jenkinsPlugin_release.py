@@ -260,11 +260,12 @@ if Linux:
 
 # pass_path = os.path.join(os.path.abspath('.'), "workspace", ".password.txt")
 # matlab_repo.git.config("--global","--add", 'credential.helper', f"store --file {pass_path}")
-if Linux:
-    pass_path = os.path.join(os.path.abspath('.'), "workspace", ".password.txt")
-    matlab_repo.git.config("--global","--add", 'credential.helper', f"store --file {pass_path}")
+
 
 while (not (validate_username_password)):
+    if Linux:
+        pass_path = os.path.join(os.path.abspath('.'), ".password.txt")
+        matlab_repo.git.config("--global","--add", 'credential.helper', f"store --file {pass_path}")
 
     # else:
     #     matlab_repo.git.config("--global", "--add", 'credential.helper', "manager")
