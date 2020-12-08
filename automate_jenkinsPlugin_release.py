@@ -218,6 +218,10 @@ except:
     clean_workspace_and_exit(
         "Error while connecting to jenkins server.\nPlease check your jenkinsServer projectName tag values in your config.xml file.", Linux)
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------
+# Deleting origin
+# matlab_repo.git.remote("rm", "origin")
+# jenkins_repo.git.remote("rm", "origin")
+
 
 # Creating remotes
 print("Creating remotes for local matlab repo and local jenkins repo...")
@@ -225,39 +229,45 @@ print("Creating remotes for local matlab repo and local jenkins repo...")
 matlabs_remote = matlab_repo.create_remote("jenkins_github", targetGithub_url)
 
 jenkins_remote = jenkins_repo.create_remote("matlab_github", sourceGithub_url)
-#---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Validating username and password
-# print("Credential validation...")
+print("Credential validation...")
 validate_username_password = False
 
 # print("Scanning git config file for github username and password...")
 # git_config_have_credentials = True
-
-try:
-    matlab_repo.git.config("--global", "--unset-all", "credential.helper")
-    matlab_repo.git.config("--system", "--unset-all", "credential.helper")
-    matlab_repo.git.config("--local", "--unset-all", "credential.helper")
-except:
-    print("You do not have credential.helper in your git config file.")
+if Linux:
+    try:
+        matlab_repo.git.config("--global", "--unset-all", "credential.helper")
+        matlab_repo.git.config("--system", "--unset-all", "credential.helper")
+        matlab_repo.git.config("--local", "--unset-all", "credential.helper")
+    except:
+        print("You do not have credential.helper in your git config file.")
 # matlab_repo.git.config("--global", "--add", 'credential.helper', "store")
 # try:
-#     # user_name = matlab_repo.git.config('--get', 'user.name')
-#     # password1 = matlab_repo.git.config('--get', 'user.password')
-#     st_value = matlab_repo.git.config('--get', 'credential.helper')
-#     if(st_value != "store"):
-#         git_config_have_credentials = False
-#         matlab_repo.git.config("--global", "--add", 'credential.helper', "store")
-#         print("Error while fetching credentilas from your git config file.")
+#     # user_name = matlab_repo.git.config("--global",'--get', 'user.name')
+#     # password1 = matlab_repo.git.config("--global",'--get', 'user.password')
+#     # st_value = matlab_repo.git.config('--get', 'credential.helper')
+#     # if(st_value != "store"):
+#     #     git_config_have_credentials = False
+#     #     matlab_repo.git.config("--global", "--add", 'credential.helper', "store")
+#     #     print("Error while fetching credentilas from your git config file.")
 # except:
 #     git_config_have_credentials = False
-#     matlab_repo.git.config("--global", "--add", 'credential.helper', "store")
-#     print("Error while fetching credentilas from your git config file.")
+#     # matlab_repo.git.config("--global", "--add", 'credential.helper', "store")
+#     print("Error while fetching credentials from your git config file.")
+
+# pass_path = os.path.join(os.path.abspath('.'), "workspace", ".password.txt")
+# matlab_repo.git.config("--global","--add", 'credential.helper', f"store --file {pass_path}")
+if Linux:
+    pass_path = os.path.join(os.path.abspath('.'), "workspace", ".password.txt")
+    matlab_repo.git.config("--global","--add", 'credential.helper', f"store --file {pass_path}")
 
 while (not (validate_username_password)):
 
-    pass_path = os.path.join(os.path.abspath('.'), "workspace", "password")
-    matlab_repo.git.config("--global","--add", 'credential.helper', f"store --file={pass_path}")
+    # else:
+    #     matlab_repo.git.config("--global", "--add", 'credential.helper', "manager")
     # if the git config file do not have credentilas or the provided credentials do not have push access
     # if (not (git_config_have_credentials)):
     #
@@ -268,7 +278,7 @@ while (not (validate_username_password)):
     #         password1 = getpass.getpass(prompt="Enter github password : ")
     #         password2 = getpass.getpass(prompt="Confirm password : ")
     #
-    #         if (password1 == password2):
+    #         if password1 == password2:
     #             password_match = True
     #         else:
     #             print("Password Not Matching.")
@@ -291,6 +301,18 @@ while (not (validate_username_password)):
 
     print("Validating credentials...")
     have_access = True
+
+    #creating remote for both repos
+    # newsourceGithub_url = sourceGithub_url.split("//")
+    # newtargetGithub_url = targetGithub_url.split("//")
+    #
+    # newsourceGithub_url = f"{newsourceGithub_url[0]}//{user_name}:{password1}@{newsourceGithub_url[1]}"
+    # newtargetGithub_url = f"{newtargetGithub_url[0]}//{user_name}:{password1}@{newtargetGithub_url[1]}"
+    # print(newsourceGithub_url)
+    # print(newtargetGithub_url)
+    #
+    # matlab_repo.git.remote("add", "origin", newsourceGithub_url)
+    # jenkins_repo.git.remote("add", "origin", newtargetGithub_url)
 
     try:
         matlab_repo.git.push("origin", "master")
@@ -317,8 +339,12 @@ while (not (validate_username_password)):
 
         else:
             git_config_have_credentials = False
-            matlab_repo.git.config("--global", "--unset-all", "credential.helper")
-            os.remove(pass_path)
+            # matlab_repo.git.remote("rm", "origin")
+            # jenkins_repo.git.remote("rm", "origin")
+
+            if Linux:
+                os.remove(pass_path)
+                matlab_repo.git.config("--global", "--unset-all", "credential.helper")
             # try:
             #     matlab_repo.git.config("--global", "--unset-all", "credential.helper")
             #     matlab_repo.git.config("--system", "--unset-all", "credential.helper")
@@ -403,7 +429,7 @@ jenkins_repo.git.merge(jenkins_remote.refs.master)
 
 if(release_version != "test"):
     print("Pushing changes from local jenkin's repo to remote jenkins github...")
-    jenkins_repo.remotes.origin.push()
+    jenkins_repo.git.push("origin", "master")
 
     print("Successfully pushed changes to remote jenkins github.")
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------
