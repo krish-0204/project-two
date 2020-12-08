@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configurations>
+
+    <preRelease>
+        <sourceGithub>
+            <!--MATLAB GitHub Repo-->
+            <url>https://github.com/krish-0204/MATLAB.git</url>
+        </sourceGithub>
+
+        <targetGithub>
+            <!--Jenkins GitHub Repo-->
+            <url>https://github.com/KrishnaAdi/Jenkins.git</url>
+        </targetGithub>
+
+        <jenkinsServer>
+            <userName>kadi</userName>
+            <password>dgkrishna</password>
+            <url>http://localhost:8080/</url>
+            <projectName>Experiment-1</projectName>
+        </jenkinsServer>
+
+    </preRelease>
+
+    <postRelease>
+        <!--MATLAB GitHub Branches-->
+        <branchName>master</branchName>
+        <branchName>dev_test</branchName>
+    </postRelease>
+
+</Configurations>
